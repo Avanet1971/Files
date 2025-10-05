@@ -19,14 +19,15 @@
 
   <!-- URL del dashboard publicado -->
   <DefaultSettings>
-    <SourceLocation DefaultValue="https://avanetl1971.github.io/Files/FinancialAnalyticsvMod.html"/>
+    <SourceLocation DefaultValue="https://avanet1971.github.io/Files/FinancialAnalyticsvMod.html"/>
   </DefaultSettings>
 
   <!-- Permisos -->
   <Permissions>ReadDocument</Permissions>
 
   <!-- Iconos opcionales (se pueden alojar en el mismo repo GitHub) -->
-  <IconUrl DefaultValue="https://avanetl1971.github.io/Files/icon-32.png"/>
-  <HighResolutionIconUrl DefaultValue="https://avanetl1971.github.io/Files/icon-80.png"/>
+  <IconUrl DefaultValue="https://avanet1971.github.io/Files/icon-32.png"/>
+  <HighResolutionIconUrl DefaultValue="https://avanet1971.github.io/Files/icon-80.png"/>
 
 </OfficeApp>
+
