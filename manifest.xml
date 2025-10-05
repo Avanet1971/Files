@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:type="TaskPaneApp">
+
+  <!-- Identificador único -->
+  <Id>2c6e5e3b-9d7a-4f10-9128-7b52a17cbb01</Id>
+  <Version>1.0.0.0</Version>
+  <ProviderName>Biomixing</ProviderName>
+  <DefaultLocale>es-ES</DefaultLocale>
+
+  <DisplayName DefaultValue="Dashboard Financiero Biomixing"/>
+  <Description DefaultValue="Panel embebido en Excel para análisis de escenarios financieros (Agresivo, Sostenido y Realista)."/>
+
+  <!-- Hosts compatibles -->
+  <Hosts>
+    <Host Name="Workbook"/>
+  </Hosts>
+
+  <!-- URL del dashboard publicado -->
+  <DefaultSettings>
+    <SourceLocation DefaultValue="https://avanetl1971.github.io/Files/FinancialAnalyticsvMod.html"/>
+  </DefaultSettings>
+
+  <!-- Permisos -->
+  <Permissions>ReadDocument</Permissions>
+
+  <!-- Iconos opcionales (se pueden alojar en el mismo repo GitHub) -->
+  <IconUrl DefaultValue="https://avanetl1971.github.io/Files/icon-32.png"/>
+  <HighResolutionIconUrl DefaultValue="https://avanetl1971.github.io/Files/icon-80.png"/>
+
+</OfficeApp>
