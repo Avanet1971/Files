@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gráficos Didácticos Comparativos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                },
+            },
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1e3a8a 0%, #064e3b 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .chart-card {
+            background-color: rgb(0, 0, 0);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.25);
+            box-shadow: 0 10px 40px 0 rgba(0,0,0,0.45);
+            border-radius: 0.75rem;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            transition: transform 0.3s ease;
+            color: white;
+        }
+        .chart-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 45px 0 rgba(0,0,0,0.6);
+        }
+        .chart-container {height: 45vh;}
+        .takeaway {
+            background-color: rgba(255,255,255,0.1);
+            border-left: 4px solid #7dd3fc;
+            padding: 1rem;
+            margin-top: 1.5rem;
+            border-radius: 0.5rem;
+            color: #d1d5db;
+        }
+        .yearSlider {
+            background: #374151;
+            height: 8px;
+            border-radius: 4px;
+            outline: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+            width: 100%;
+            max-width: 600px;
+        }
+        .yearSlider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #7dd3fc;
+            border: 4px solid #fff;
+            transition: background 0.2s;
+        }
+        .yearSlider::-webkit-slider-thumb:hover {background: #38bdf8;}
+        .radarChartContainer {
+            height: 500px;
+            position: relative;
+            margin-top: 24px;
+            padding-bottom: 20px;
+        }
+        @media (max-width: 768px) {
+            .radarChartContainer {height: 350px;}
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 50;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .modal-content {
+            background-color: rgba(255,255,255,0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0 10px 50px rgba(0,0,0,0.9);
+            color: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            max-width: min(600px,95vw);
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+        .modal-overlay.open {display: flex; opacity: 1;}
+        .modal-overlay.open .modal-content {transform: scale(1);}
+        .modal-content ul {
+            list-style-type: disc;
+            margin-left: 1.5rem;
+            padding-left: 0.5rem;
+        }
+        .modal-content strong {color: #7dd3fc;}
+        .info-button {
+            color: #7dd3fc;
+            cursor: pointer;
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+        .info-button:hover {
+            color: #38bdf8;
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-6 lg:p-8">
+
+    <div class="max-w-5xl mx-auto">
+        
+        <!-- Encabezado principal y título general (Adaptado al color de fondo oscuro) -->
+        <header class="text-center mb-10 text-white">
+            <h1 class="text-4xl font-bold">Análisis de Escenarios Estratégicos</h1>
+            <p class="text-xl mt-2">Comparativa visual de proyecciones financieras clave.</p>
+        </header>
+
+        <!-- Encabezado de comparación (Agresivo VS Sostenido VS Realista) -->
+        <section class="mb-12 flex flex-col items-center justify-center gap-6 border-b border-white/20 pb-6">
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-6">
+                <!-- Escenario 1: Agresivo (AZUL) -->
+                <div class="px-6 py-3 rounded-full bg-blue-600/90 text-white font-bold text-lg shadow-lg flex items-center gap-2 transition duration-300 hover:scale-[1.05]">
+                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="#3b82f6"/>
+                    </svg>
+                    Escenario 1: Agresivo
+                </div>
+                <span class="text-4xl font-extrabold text-white leading-none hidden sm:block">VS</span>
+                <!-- Escenario 2: Sostenido (VERDE) -->
+                <div class="px-6 py-3 rounded-full bg-green-600/90 text-white font-bold text-lg shadow-lg flex items-center gap-2 transition duration-300 hover:scale-[1.05]">
+                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="#10b981"/>
+                    </svg>
+                    Escenario 2: Sostenido
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN: Métricas Clave en formato "Boxes" (Glassmorphism) -->
+        <section class="mb-12">
+            <div class="chart-card glassmorphism p-6 shadow-2xl">
+                <h2 class="text-2xl font-bold text-white mb-6 text-center border-b border-white/20 pb-4">
+                    Métricas Clave de la Proyección (Resumen)
+                </h2>
+
+                <!-- Contenedor principal de las métricas (GRID) -->
+                <div class="space-y-3">
+                    <!-- Fila de Cabecera (Grid Titles) -->
+                    <div class="grid grid-cols-3 gap-4 text-sm font-semibold uppercase tracking-wider text-cyan-300 border-b border-white/30 pb-3 px-3">
+                        <div class="whitespace-nowrap">Métrica</div>
+                        <div class="text-center whitespace-nowrap text-blue-400">Escenario 1 (Agresivo)</div>
+                        <div class="text-center whitespace-nowrap text-green-400">Escenario 2 (Sostenido)</div>
+                    </div>
+
+                    <!-- BOX 1: Punto de Equilibrio (ACTUALIZADO) -->
+                    <div class="grid grid-cols-3 gap-4 p-3 rounded-lg bg-white/5 items-center hover:bg-white/10 transition duration-200">
+                        <div class="font-semibold whitespace-nowrap">Año con retornos positivos </div>
+                        <div class="text-center text-red-300 whitespace-nowrap">2028</div>
+                        <div class="text-center text-green-300 whitespace-nowrap">2027 (Un año antes)</div>
+                    </div>
+                    
+                    <!-- BOX 2: RRHH en 2027 -->
+                    <div class="grid grid-cols-3 gap-4 p-3 rounded-lg bg-white/5 items-center hover:bg-white/10 transition duration-200">
+                        <div class="font-semibold whitespace-nowrap">RRHH en 2027</div>
+                        <div class="text-center text-red-300 whitespace-nowrap">~68 personas</div>
+                        <div class="text-center text-green-300 whitespace-nowrap">~32 personas <span class="text-xs text-green-200 align-middle">~50% menos</span></div>
+                    </div>
+                    
+                    <!-- BOX 3: Media RRHH -->
+                    <div class="grid grid-cols-3 gap-4 p-3 rounded-lg bg-white/5 items-center hover:bg-white/10 transition duration-200">
+                        <div class="font-semibold whitespace-nowrap">Media RRHH (2026–2031)</div>
+                        <div class="text-center text-red-300 whitespace-nowrap">246 personas/año</div>
+                        <div class="text-center text-green-300 whitespace-nowrap">81 personas/año <span class="text-xs text-green-200 align-middle">~54% menos</span></div>
+                    </div>
+                                
+                    <!-- BOX 5: Robustez Operativa con Botón y Modal -->
+                    <div class="grid grid-cols-3 gap-4 p-3 rounded-lg bg-white/5 items-center hover:bg-white/10 transition duration-200">
+                        <div class="font-semibold flex items-center gap-2 whitespace-nowrap">
+                            Robustez operativa (1–5)
+                            <svg id="openModalBtn" onclick="openRobustezModal()" class="w-5 h-5 info-button" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <div class="text-center text-red-300 whitespace-nowrap">Baja 2/5</div>
+                        <div class="text-center text-green-300 whitespace-nowrap">Media–Alta 4/5</div>
+                    </div>
+                    
+                    <!-- BOX 6: Índice de riesgo financiero con Botón y Modal -->
+                    <div class="grid grid-cols-3 gap-4 p-3 rounded-lg bg-white/5 items-center hover:bg-white/10 transition duration-200">
+                        <div class="font-semibold flex items-center gap-2 whitespace-nowrap">
+                            I. riesgo financiero (1–5)
+                            <svg id="openRiesgoModalBtn" onclick="openRiesgoModal()" class="w-5 h-5 info-button" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <div class="text-center text-red-300 whitespace-nowrap">Alto (5/5)</div>
+                        <div class="text-center text-green-300 whitespace-nowrap">Medio (3/5)</div>
+                    </div>
+                    
+                    <!-- BOX 7: Valor estimado de la empresa (Destacado) -->
+                    <div class="grid grid-cols-3 gap-4 p-4 rounded-xl bg-blue-900/40 font-extrabold text-lg items-center shadow-lg border border-blue-400/50 mt-5 transition duration-200 hover:scale-[1.01]">
+                        <div class="text-white whitespace-nowrap">Valor estimado (2031)</div>
+                        <div class="text-center text-red-300 whitespace-nowrap">23,8 M€ <span class="text-xs font-normal block italic text-gray-300">(Tasas altas/Más RRHH/Mas riesgo)</span></div>
+                        <div class="text-center text-green-300 whitespace-nowrap">24,7 M€ <span class="text-xs font-normal block italic text-gray-300">(Menores tasas/Menos RRHH/Más sostenible)</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Gráfico 1: Ingresos (Revenues) y Ratio de Crecimiento (Ratio) -->
+        <div class="chart-card">
+            <!-- Títulos ajustados a blanco -->
+            <h2 class="text-2xl font-semibold text-white">Gráfico 1: Crecimiento de Ingresos (Línea) vs. Ratio de Crecimiento (Barras)</h2>
+            <p class="text-gray-200 mt-1">Comparativa de Ingresos (Eje Izquierdo, Logarítmico) vs. Ratio de Crecimiento (Eje Derecho, Porcentual).</p>
+            <div class="chart-container mt-6">
+                <canvas id="revenuesChart"></canvas>
+            </div>
+            <div class="takeaway">
+                <p class="font-semibold text-cyan-300">La Historia:</p>
+                <p class="text-gray-100 mt-1">El escenario sostenido demuestra que no hace falta crecer de forma explosiva para alcanzar la meta. Mantener un ritmo más moderado permite ratios de crecimiento más estables, menos desgaste y mayor credibilidad financiera.</p>
+            </div>
+        </div>
+        
+        <!-- Gráfico 2: Resultado Neto (Net Income) -->
+        <div class="chart-card">
+            <h2 class="text-2xl font-semibold text-white">Gráfico 2: El Coste Oculto del Crecimiento (Resultado Neto)</h2>
+            <p class="text-gray-200 mt-1">Comparativa de la rentabilidad.</p>
+            <div class="flex items-center gap-4 mb-2">
+                <button id="toggleZoomBtn" class="py-1 px-4 rounded-lg bg-blue-600/80 hover:bg-blue-700/80 text-white font-semibold transition duration-200">Alternar Zoom</button>
+                <span id="zoomStatus" class="text-cyan-300 text-sm"></span>
+            </div>
+            <div class="chart-container mt-6">
+                <canvas id="netIncomeChart"></canvas>
+            </div>
+            <div class="takeaway">
+                <p class="font-semibold text-cyan-300">La Historia:</p>
+                <p class="text-gray-100 mt-1">El crecimiento agresivo entra en pérdidas profundas durante cuatro años antes de volverse rentable. El escenario sostenido, en cambio, controla el ‘valle de la muerte’ y alcanza beneficios antes a pesar de generar menos ingresos brutos, reduciendo riesgos por sobredimensionamiento de RRHH.</p>
+            </div>
+        </div>
+
+        <!-- Gráfico 3: La Carga Operativa (Personal/Año) -->
+        <div class="chart-card">
+            <h2 class="text-2xl font-semibold text-white">Gráfico 3: La Carga Operativa y de Talento (Personal)</h2>
+            <p class="text-gray-200 mt-1">Comparativa del personal requerido (Personas/año).</p>
+            <div class="chart-container mt-6">
+                <canvas id="hrChart"></canvas>
+            </div>
+            <div class="takeaway">
+                <p class="font-semibold text-cyan-300">La Historia:</p>
+                <p class="text-gray-100 mt-1">El crecimiento del Escenario 1 exige una escalada de personal desmesurada. Esto implica un riesgo enorme en contratación, cultura y gestión, especialmente sin la infraestructura adecuada. El enfoque que minimiza el riesgo de contratación masiva, asegura mejor la cultura de equipo y mantiene la eficiencia operativa.</p>
+            </div>
+        </div>
+
+        <!-- Gráfico 4: Evolución de la Diversificación del Ingreso (Radar) - EL NUEVO GRÁFICO DE RADAR -->
+        <div class="chart-card">
+            <h2 class="text-2xl font-semibold text-white">Gráfico 4: Evolución de la Diversificación del Ingreso (Radar)</h2>
+            <p class="text-gray-200 mt-1">Usa la barra deslizante para ver el mix de ingresos por producto en cada año ($2025–2031$). Muestra el riesgo de concentración anual.</p>
+            
+            <!-- Barra de Secuencia Temporal (Slider) -->
+            <div style="display: flex; flex-direction: column; align-items: center; margin-top: 24px; margin-bottom: 16px;">
+                <label for="productYearSlider" class="text-xl font-bold mb-2">Año Seleccionado: <span id="currentProductYearDisplay" class="text-cyan-300">2025</span></label>
+                <input type="range" id="productYearSlider" class="yearSlider" min="0" max="6" value="0" step="1">
+                <div class="flex justify-between w-full max-w-[600px] text-sm mt-1 text-gray-300 px-1">
+                    <span>2025</span>
+                    <span>2026</span>
+                    <span>2027</span>
+                    <span>2028</span>
+                    <span>2029</span>
+                    <span>2030</span>
+                    <span>2031</span>
+                </div>
+            </div>
+
+            <div class="flex gap-6 justify-center items-center mb-4">
+                <!-- Filtro de escenarios eliminado -->
+            </div>
+            <div class="radarChartContainer">
+                <canvas id="productMixChart"></canvas>
+            </div>
+            
+            <div class="takeaway">
+                <p class="font-semibold text-cyan-300">La Historia (El Riesgo en el Tiempo):</p>
+                <p class="text-gray-100 mt-1">Avanza el deslizador. El escenario 1 centra el crecimiento en Complete BR, mientras el escenario 2 vuelca el crecmiento en Retrofit y Agitation manufacturers, Control systems y Biogas Engineering, es decir, más distribuido y equilibrado sobre lo que siempre será un referente .</p>
+            </div>
+        </div>
+        
+    </div>
+
+    <!-- -------------------------------------- -->
+    <!-- MODAL 1: Robustez Operativa -->
+    <!-- -------------------------------------- -->
+    <div id="robustezModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="robustezModalTitle">
+        <div class="modal-content">
+            <h3 id="robustezModalTitle" class="text-2xl font-bold mb-4 border-b border-white/30 pb-2">Robustez Operativa (Índice de Sostenibilidad)</h3>
+            <p class="mb-4 text-gray-300">Este índice (1 a 5) no es un número financiero directo. Es una métrica sintética que compara la solidez de cada escenario basada en cómo se gestiona el riesgo y la infraestructura, considerando los siguientes factores clave:</p>
+            <ul class="space-y-4 text-sm mt-2">
+                <li>
+                    <p class="font-semibold mb-1"><strong>1. Estructura de RRHH</strong></p>
+                    <p class="ml-4">Esc. 1: crecimiento muy brusco de plantilla (de &lt;10 a &gt;68 en 2 años) sin planificación de gestión de personas riesgo de rotación, falta de procesos internos.</p>
+                    <p class="ml-4 mt-1">Esc. 2: plantilla más contenida y acompasada a los ingresos estructura más sostenible.</p>
+                </li>
+                <li>
+                    <p class="font-semibold mb-1"><strong>2. Inversión en tangibles vs. gastos corrientes</strong></p>
+                    <p class="ml-4">Esc. 1: el equity se gasta sobre todo en salarios, que son costes recurrentes.</p>
+                    <p class="ml-4 mt-1">Esc. 2: más foco en infraestructura y equipamiento activos que quedan en balance y soportan crecimiento futuro.</p>
+                </li>
+                <li>
+                    <p class="font-semibold mb-1"><strong>3. Capacidad de escalar procesos</strong></p>
+                    <p class="ml-4">Esc. 1: rápido aumento de RRHH sin reforzar sistemas de control y producción alto riesgo de “cuellos de botella”.</p>
+                    <p class="ml-4 mt-1">Esc. 2: escalado más gradual y alineado con validaciones técnicas, proyectos de I+D y colaboraciones con fabricantes.</p>
+                </li>
+                <li>
+                    <p class="font-semibold mb-1"><strong>4. Dependencia de financiación externa</strong></p>
+                    <p class="ml-4">Esc. 1: burn rate elevado, fuerte dependencia de nuevas rondas.</p>
+                    <p class="ml-4 mt-1">Esc. 2: cash burn más moderado, mayor resiliencia ante retrasos de capital.</p>
+                </li>
+            </ul>
+            
+            <p class="mt-5 italic text-gray-400 border-t border-white/20 pt-3">En resumen: la Robustez Operativa mide la capacidad de la organización de sostener el crecimiento sin que la estructura interna se rompa por falta de gestión, inversión en activos o demasiada presión financiera.</p>
+
+            <button onclick="closeRobustezModal()" class="mt-6 w-full py-2 bg-blue-600/90 hover:bg-blue-700/90 rounded-lg font-bold transition duration-200" aria-label="Cerrar Explicación">
+                Cerrar Explicación
+            </button>
+        </div>
+    </div>
+    
+    <!-- -------------------------------------- -->
+    <!-- MODAL 2: Índice de Riesgo Financiero (CORREGIDO) -->
+    <!-- -------------------------------------- -->
+    <div id="riesgoModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="riesgoModalTitle">
+        <div class="modal-content">
+            <h3 id="riesgoModalTitle" class="text-2xl font-bold mb-4 border-b border-white/30 pb-2">Índice de Riesgo Financiero (1–5)</h3>
+            <p class="mb-4 text-gray-300">Esta métrica sintética mide la <strong>vulnerabilidad</strong> de la empresa a quedarse sin caja o a depender de rondas de capital no planificadas, basándose en los siguientes indicadores clave derivados del modelo financiero:</p>
+            <ul class="space-y-4 text-sm mt-2">
+                <li>
+                    <p class="font-semibold mb-1"><strong>1. Cash burn vs. Equity disponible</strong></p>
+                    <p class="ml-4">Esc. 1: El gasto en RRHH y estructura es muy elevado, consumiendo rápido el <strong>equity</strong> &rarr; Aumenta el riesgo de liquidez.</p>
+                    <p class="ml-4 mt-1">Esc. 2: El <strong>cash burn</strong> es más bajo y el <strong>equity</strong> financia más <strong>activos tangibles</strong> que respaldan el balance.</p>
+                </li>
+                <li>
+                    <p class="font-semibold mb-1"><strong>2. Estructura de costes fijos vs. variables</strong></p>
+                    <p class="ml-4">Esc. 1: Alta proporción de <strong>costes fijos</strong> (sueldos altos, plantilla sobredimensionada), lo que genera rigidez financiera.</p>
+                    <p class="ml-4 mt-1">Esc. 2: Los costes son más <strong>modulables</strong>, alineados con la evolución de los ingresos y el avance de los proyectos.</p>
+                </li>
+                <li>
+                    <p class="font-semibold mb-1"><strong>3. Endeudamiento y dependencia de nuevas rondas</strong></p>
+                    <p class="ml-4">Esc. 1: Mayor probabilidad de necesitar <strong>ampliaciones de capital tempranas</strong> para sobrevivir al escalado (fuerte dependencia).</p>
+                    <p class="ml-4 mt-1">Esc. 2: Mayor <strong>resiliencia</strong>, menos presión inmediata para conseguir nuevas rondas de financiación.</p>
+                </li>
+                <li>
+                    <p class="font-semibold mb-1"><strong>4. Volatilidad del crecimiento proyectado</strong></p>
+                    <p class="ml-4">Esc. 1: Saltos de ingresos muy agresivos (crecimiento de 400%, 330%, etc.) Si no se cumplen, se genera un <strong>gap financiero</strong> peligroso.</p>
+                    <p class="ml-4 mt-1">Esc. 2: Crecimiento más progresivo y <strong>creíble</strong>, lo que implica un menor riesgo de incumplimiento frente a los inversores.</p>
+                </li>
+            </ul>
+            <p class="mt-5 italic text-gray-400 border-t border-white/20 pt-3">En resumen: El riesgo financiero no solo es la liquidez, sino también la rigidez del modelo de costes y la credibilidad de las proyecciones de crecimiento.</p>
+            <button onclick="closeRiesgoModal()" class="mt-6 w-full py-2 bg-blue-600/90 hover:bg-blue-700/90 rounded-lg font-bold transition duration-200" aria-label="Cerrar Explicación">
+                Cerrar Explicación
+            </button>
+        </div>
+    </div>
+
+    
+    <script>
+    // Modal logic
+    document.addEventListener('DOMContentLoaded', function() {
+        const robustezModal = document.getElementById('robustezModal');
+        const riesgoModal = document.getElementById('riesgoModal');
+        window.openRobustezModal = function() { if(robustezModal) robustezModal.classList.add('open'); };
+        window.closeRobustezModal = function() { if(robustezModal) robustezModal.classList.remove('open'); };
+        window.openRiesgoModal = function() { if(riesgoModal) riesgoModal.classList.add('open'); };
+        window.closeRiesgoModal = function() { if(riesgoModal) riesgoModal.classList.remove('open'); };
+        if(robustezModal) robustezModal.addEventListener('click', e => { if (e.target === robustezModal) window.closeRobustezModal(); });
+        if(riesgoModal) riesgoModal.addEventListener('click', e => { if (e.target === riesgoModal) window.closeRiesgoModal(); });
+
+        // Chart logic
+        const labels = ['2025','2026','2027','2028','2029','2030','2031'];
+        const scenario1 = {
+            revenues: [250, 1000, 4000, 13200, 27000, 41000, 54000],
+            plRatios: [5.07, 4.00, 4.00, 3.30, 2.05, 1.52, 1.32],
+            netIncome: [-106, -525, -234, 2543, 6524, 10687, 14824],
+            cashflow: [1476, 298, 1932, 1639, 3985, 8754, 16140],
+            persons: [11, 28, 68, 156, 290, 412, 523],
+            capex: [343, 824, 2481, 2953, 3822, 4731, 5592]
+        };
+        const scenario2 = {
+            revenues: [ 171, 780, 2412, 6743, 15203, 26569, 36900],
+            plRatios: [3.47, 4.56, 3.09, 2.80, 2.25, 1.75, 1.39],
+            netIncome: [ -63, -536, 57, 1919, 5759, 10724, 15181],
+            cashflow: [ 936, 39, 693, 291, 2492, 8409, 17595],
+            persons: [ 7, 21, 32, 49, 84, 127, 170],
+            capex: [ 543, 1519, 3176, 3668, 4859, 5617, 6361]
+        };
+        // Escenario 3 eliminado
+        const revenueData = {
+            2025: { escenario1: [56, 87, 51, 48, 0, 0, 7], escenario2: [56, 94, 0, 0, 0, 0, 20]  },
+            2026: { escenario1: [230, 150, 140, 330, 30, 40, 80], escenario2: [212, 204, 100, 120, 0, 80, 63]  },
+            2027: { escenario1: [1520, 560, 320, 560, 360, 360, 320], escenario2: [687, 787, 324, 216, 0, 252, 144]  },
+            2028: { escenario1: [5016, 1584, 924, 396, 2904, 1320, 1056], escenario2: [1804, 2720, 758, 432, 0, 793, 234]},
+            2029: { escenario1: [6345, 2700, 1890, 270, 11880, 2295, 1620], escenario2: [3400, 7897, 1259, 311, 0, 2037, 297] },
+            2030: { escenario1: [6765, 4100, 2870, 0, 21730, 3280, 2255], escenario2: [4703, 16305, 1564, 0, 155, 3500, 339]  },
+            2031: { escenario1: [7020, 5400, 3780, 0, 30780, 4320, 2700], escenario2: [5627, 23865, 1795, 0, 746, 4492, 373]}
+
+        };
+
+        function convertToPercentages(data){
+            const percentageData={};
+            for(const[year,scenarios]of Object.entries(data)){
+                percentageData[year]={};
+                for(const[scenario,values]of Object.entries(scenarios)){
+                    // Asegurarse que los valores son números
+                    const cleanValues = values.map(v => typeof v === 'string' ? parseFloat(v.replace(/[^\d.-]/g, '')) : v);
+                    const total = cleanValues.reduce((sum,value)=>sum+value,0);
+                    percentageData[year][scenario]=cleanValues.map(value=>total>0?Math.round((value/total)*100*10)/10:0);
+                }
+            }
+            return percentageData;
+        }
+
+        const productData=convertToPercentages(revenueData);
+        const productLabels=['Retrofit','Agitation Manufacturers','Biogas Engineering','BR Manufacturers','Complete BR','Control Systems','Culture Optimization'];
+        const productYears=['2025','2026','2027','2028','2029','2030','2031'];
+    let productRadarChart;
+    // Estado de visibilidad de escenarios (solo 2 escenarios)
+    let radarVisibility = [true, true];
+
+        const getCommonOptions = (isCurrency=true,isAccumulated=false) => ({
+            responsive:true,maintainAspectRatio:false,
+            scales:{
+                y:{
+                    ticks:{callback:v=>v===0||!isFinite(v)?'0':isCurrency?`${v.toLocaleString('es-ES',{maximumFractionDigits:0})} k€`:v.toLocaleString('es-ES',{maximumFractionDigits:0}),color:'white'},
+                    grid:{color:c=>c.tick.value===0?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.1)'},
+                    title:{display:true,text:isCurrency?'Valor (k€)':'Personas',color:'white'}
+                },
+                x:{ticks:{color:'white'},grid:{display:false}}
+            },
+            plugins:{
+                legend:{position:'top',labels:{color:'white'}},
+                tooltip:{callbacks:{title:([c])=>`${c.label}`,label:c=>{
+                    const v=c.parsed.y;const f=v.toLocaleString('es-ES',{maximumFractionDigits:0});let u=isCurrency?'k€':'personas';if(c.dataset.yAxisID&&c.dataset.yAxisID!=='y1'&&c.dataset.yAxisID!=='y2'&&!isCurrency)u='personas';const p=isAccumulated?'Acumulado: ':'';return`${c.dataset.label}: ${p}${f} ${u}`;}}}
+            }
+        });
+
+        const getCombinedOptions = () => ({
+            responsive:true,maintainAspectRatio:false,
+            plugins:{legend:{position:'top',labels:{color:'white'}},tooltip:{callbacks:{title:([c])=>`${c.label}`,label:c=>{
+                const v=c.parsed.y;let l=c.dataset.label;
+                if(c.dataset.yAxisID==='y1'){const f=v.toLocaleString('es-ES',{maximumFractionDigits:0});return`${l}: ${f} k€`;}else if(c.dataset.yAxisID==='y2'){const i=c.dataIndex;const r=c.dataset.data[i];const f=((r-1)*100).toLocaleString('es-ES',{maximumFractionDigits:0});return`${l}: ${f}% de Crecimiento`;}return`${l}: ${v}`;}}}},
+            scales:{x:{ticks:{color:'white'},grid:{display:false}},y1:{type:'logarithmic',position:'left',title:{display:true,text:'Ingresos (k€) - Log',color:'white'},min:100,ticks:{callback:v=>v===0||!isFinite(v)?'':`${v.toLocaleString('es-ES',{maximumFractionDigits:0})} k€`,color:'white'},grid:{z:1,color:'rgba(255,255,255,0.2)'}},y2:{position:'right',title:{display:true,text:'Ratio (x)',color:'white'},min:0,max:5.5,ticks:{callback:v=>`${((v-1)*100).toLocaleString('es-ES',{maximumFractionDigits:0})}%`,color:'white'},grid:{drawOnChartArea:false}}}
+        });
+
+        function initializeProductRadarChart(){
+            const chartElem = document.getElementById('productMixChart');
+            if(!chartElem) return;
+            const ctx=chartElem.getContext('2d');
+            const currentYear = '2025';
+            productRadarChart = new Chart(ctx,{
+                type:'radar',
+                data:{labels:productLabels,datasets:[
+                    {label:'Escenario 1 (Agresivo)',data:productData[currentYear].escenario1,borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,0.25)',pointBackgroundColor:'#3b82f6',pointBorderColor:'#fff',pointBorderWidth:2,borderWidth:2,tension:0.1,hidden:!radarVisibility[0]},
+                    {label:'Escenario 2 (Sostenido)',data:productData[currentYear].escenario2,borderColor:'#10b981',backgroundColor:'rgba(16,185,129,0.25)',pointBackgroundColor:'#10b981',pointBorderColor:'#fff',pointBorderWidth:2,borderWidth:2,tension:0.1,hidden:!radarVisibility[1]},
+                    // Escenario 3 eliminado
+                ]},
+                options:{
+                    responsive:true,maintainAspectRatio:false,
+                    plugins:{legend:{labels:{color:'#fff',font:{size:14}}},tooltip:{backgroundColor:'rgba(0,0,0,0.9)',titleColor:'#fff',bodyColor:'#fff',borderColor:'#7dd3fc',borderWidth:1,callbacks:{label:function(context){
+                        const yearIndex=parseInt(document.getElementById('productYearSlider').value);
+                        const year=productYears[yearIndex];
+                        const productIndex=context.dataIndex;
+                        let scenario='escenario1';
+                        if(context.datasetIndex===1) scenario='escenario2';
+                        const absoluteValue=revenueData[parseInt(year)][scenario][productIndex];
+                        return[
+                            context.dataset.label+': '+context.parsed.r+'%',
+                            'Ingreso: '+absoluteValue.toLocaleString('es-ES',{maximumFractionDigits:0})+' k€'
+                        ];
+                    }}}},
+                    scales:{r:{min:0,max:60,stepSize:10,beginAtZero:true,angleLines:{color:'rgba(255,255,255,0.3)',lineWidth:1},grid:{color:'rgba(255,255,255,0.2)',circular:true},pointLabels:{color:'#fff',font:{size:12,weight:'bold'}},ticks:{color:'rgba(255,255,255,0.8)',backdropColor:'rgba(30,41,59,0.8)',font:{size:10},callback:v=>v+'%'}}},interaction:{intersect:false},animation:{duration:500}}
+                });
+        }
+
+        function updateProductRadarChart(yearIndex){
+            const year=productYears[yearIndex];
+            const yearDisplay = document.getElementById('currentProductYearDisplay');
+            if(yearDisplay) yearDisplay.textContent=year;
+            if(productRadarChart && productData[year]) {
+                        const escenarios = ['escenario1','escenario2'];
+                escenarios.forEach((esc, idx) => {
+                    if(!productData[year][esc] || !Array.isArray(productData[year][esc])) {
+                        productRadarChart.data.datasets[idx].data = Array(productLabels.length).fill(0);
+                    } else {
+                        productRadarChart.data.datasets[idx].data = productData[year][esc];
+                    }
+                    productRadarChart.data.datasets[idx].hidden = !radarVisibility[idx];
+                });
+                productRadarChart.update('active');
+            }
+        }
+
+        // Initialize all charts using getElementById
+        initializeProductRadarChart();
+
+        const revenuesElem = document.getElementById('revenuesChart');
+        if(revenuesElem) {
+            new Chart(revenuesElem.getContext('2d'), {
+                type:'line',
+                data:{labels:labels,datasets:[
+                    {label:'Ingresos E1 (Agresivo)',data:scenario1.revenues,borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,0.2)',tension:0.3,fill:false,pointRadius:4,pointHoverRadius:6,yAxisID:'y1',type:'line'},
+                    {label:'Ingresos E2 (Sostenido)',data:scenario2.revenues,borderColor:'#10b981',backgroundColor:'rgba(16,185,129,0.2)',tension:0.3,fill:false,pointRadius:4,pointHoverRadius:6,yAxisID:'y1',type:'line'},
+                    {label:'Ratio Crecimiento E1',yAxisID:'y2',type:'bar',data:scenario1.plRatios.map(r=>r),backgroundColor:'rgba(59,130,246,0.6)',borderColor:'#3b82f6',borderWidth:1,order:2},
+                    {label:'Ratio Crecimiento E2',yAxisID:'y2',type:'bar',data:scenario2.plRatios.map(r=>r),backgroundColor:'rgba(16,185,129,0.6)',borderColor:'#10b981',borderWidth:1,order:2}
+                ]},
+                options:getCombinedOptions()
+            });
+        }
+
+        const netIncomeElem = document.getElementById('netIncomeChart');
+        let netIncomeChartInstance = null;
+        function renderNetIncomeChart(zoomed=false) {
+            const ctx = netIncomeElem.getContext('2d');
+            if(netIncomeChartInstance) { netIncomeChartInstance.destroy(); }
+            let options = {...getCommonOptions(true,false),scales:{
+                y:{...getCommonOptions(true,false).scales.y,title:{display:true,text:'Resultado Neto Anual (k€)',color:'white'}},
+                x:{
+                    ticks:{color:'white'},
+                    grid:{display:false}
+                }
+            }};
+            if(zoomed) {
+                options.scales.y.min = -600;
+                options.scales.y.max = 3000;
+                options.scales.y.title.text = 'Resultado Neto (Zoom primeros años)';
+            }
+            netIncomeChartInstance = new Chart(ctx, {
+                type:'line',
+                data:{labels:labels,datasets:[
+                    {label:'S1 Resultado Neto (k€)',data:scenario1.netIncome,borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,0.2)',borderWidth:3,fill:'start',tension:0.3,pointRadius:5,pointBackgroundColor:c=>c.parsed.y>=0?'#3b82f6':'rgb(255,99,132)'},
+                    {label:'S2 Resultado Neto (k€)',data:scenario2.netIncome,borderColor:'#10b981',backgroundColor:'rgba(16,185,129,0.2)',borderWidth:3,fill:'start',tension:0.3,pointRadius:5,pointBackgroundColor:c=>c.parsed.y>=0?'#10b981':'rgb(255,99,132)'},
+                    // Escenario 3 eliminado
+                ]},
+                options
+            });
+            const zoomStatus = document.getElementById('zoomStatus');
+            if(zoomStatus) zoomStatus.textContent = zoomed ? 'Vista: Zoom primeros años' : 'Vista: Completa';
+        }
+        if(netIncomeElem) {
+            renderNetIncomeChart(false);
+            const toggleZoomBtn = document.getElementById('toggleZoomBtn');
+            let zoomed = false;
+            if(toggleZoomBtn) {
+                toggleZoomBtn.addEventListener('click', function() {
+                    zoomed = !zoomed;
+                    renderNetIncomeChart(zoomed);
+                });
+            }
+        }
+
+        const hrElem = document.getElementById('hrChart');
+        if(hrElem) {
+            new Chart(hrElem.getContext('2d'), {
+                type:'line',
+                data:{labels:labels,datasets:[
+                    {label:'Personal E1 (Agresivo)',data:scenario1.persons,borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,0.3)',tension:0.4,fill:'stack',pointRadius:5,pointHoverRadius:7,yAxisID:'y'},
+                    {label:'Personal E2 (Sostenido)',data:scenario2.persons,borderColor:'#10b981',backgroundColor:'rgba(16,185,129,0.5)',tension:0.4,fill:'stack',pointRadius:5,pointHoverRadius:7,yAxisID:'y'},
+                    {label:'CAPEX/Tecn E1',data:scenario1.capex,borderColor:'#60a5fa',backgroundColor:'rgba(96,165,250,0.5)',tension:0.4,fill:false,pointRadius:4,pointHoverRadius:6,yAxisID:'y2',type:'bar'},
+                    {label:'CAPEX/Tecn E2',data:scenario2.capex,borderColor:'#34d399',backgroundColor:'rgba(52,211,153,0.5)',tension:0.4,fill:false,pointRadius:4,pointHoverRadius:6,yAxisID:'y2',type:'bar'}
+                ]},
+                options:{
+                    responsive:true,maintainAspectRatio:false,
+                    scales:{
+                        y:{
+                            title:{display:true,text:'Personas',color:'white'},
+                            ticks:{color:'white'},
+                            grid:{color:'rgba(255,255,255,0.1)'}
+                        },
+                        y2:{
+                            position:'right',
+                            title:{display:true,text:'CAPEX/Tecn (k€)',color:'white'},
+                            min:0,
+                            max:6000,
+                            grid:{drawOnChartArea:false},
+                            ticks:{
+                                color:'white',
+                                callback: v => v.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' k€'
+                            }
+                        }
+                    },
+                    plugins:{legend:{position:'top',labels:{color:'white'}},tooltip:{mode:'index',intersect:false}}
+                }
+            });
+        }
+
+        // Set up radar chart slider
+        const productYearSlider = document.getElementById('productYearSlider');
+        if(productYearSlider) {
+            productYearSlider.addEventListener('input', function() {
+                updateProductRadarChart(parseInt(this.value));
+            });
+            updateProductRadarChart(0);
+        }
+
+        // Filtro de escenarios
+        const chkEscenario1 = document.getElementById('chkEscenario1');
+        const chkEscenario2 = document.getElementById('chkEscenario2');
+        function updateRadarVisibility() {
+            radarVisibility[0] = chkEscenario1 ? chkEscenario1.checked : true;
+            radarVisibility[1] = chkEscenario2 ? chkEscenario2.checked : true;
+            const yearIndex = productYearSlider ? parseInt(productYearSlider.value) : 0;
+            updateProductRadarChart(yearIndex);
+        }
+        if(chkEscenario1) chkEscenario1.addEventListener('change', updateRadarVisibility);
+        if(chkEscenario2) chkEscenario2.addEventListener('change', updateRadarVisibility);
+    });
+    </script>
+</body>
+</html>
